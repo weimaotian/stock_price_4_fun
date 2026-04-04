@@ -113,15 +113,13 @@ def updatevectordb(message):
     if not validate_mrzaizai2k_user(message.chat.id):
         bot.send_message(message.chat.id, "抱歉，该命令仅限主人方源使用。\n如果你想使用此功能，请自行部署。")
         return
-    
-    updatevectordb_url = data.get('updatevectordb_url') # Update the URL if your Flask app runs on a different port or host
+
+    updatevectordb_url = data.get('updatevectordb_url')
     response = requests.post(updatevectordb_url)
     if response.status_code == 200:
-        # print("Update Vector DB Successful: Update was successful")
         logger.debug(msg = "Update Vector DB Successful: Update was successful")
-       bot.send_message(message.chat.id, "向量数据库更新成功！")
+        bot.send_message(message.chat.id, "向量数据库更新成功！")
     else:
-        # print(f"Update Vector DB Failed: {response.status_code} - {response.json()['message']}")
         logger.debug(msg = f"Update Vector DB Failed: {response.status_code} - {response.json()['message']}")
 
 
