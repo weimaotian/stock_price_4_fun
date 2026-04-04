@@ -35,7 +35,7 @@ jobs:
       run: |
           mkdir -p ~/.config/tod0
           echo "client_id: '${{ secrets.LONG_APP_KEY }}'" > ~/.config/tod0/keys.yml
-          echo "secret: '${{ secrets.LONG_APP_SECRET }}'" >> ~/.config/tod0/keys.yml
+          echo "client_secret: '${{ secrets.LONG_APP_SECRET }}'" >> ~/.config/tod0/keys.yml
 
     - name: Run bot
       run: python src/stock_bot.py
