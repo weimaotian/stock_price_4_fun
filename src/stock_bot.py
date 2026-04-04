@@ -397,22 +397,22 @@ def process_remove_stock(message):
     if symbol in watchlist:
         watchlist.remove(symbol)
         user_db.save_watch_list(user_id=message.chat.id, watch_list=watchlist)
-        bot.send_message(message.chat.id, f"已从自选清单中移除 {symbol}。更新后的清单：{watchlist}"
+        bot.send_message(message.chat.id, f"已从自选清单中移除 {symbol}。更新后的清单: {watchlist}")
         logger.debug(msg = f"{symbol} removed from your watchlist. Updated watchlist: {watchlist}")
 
     else:
-        bot.send_message(message.chat.id, f"在自选清单中未找到 {symbol}。"
+        bot.send_message(message.chat.id, f"在自选清单中未找到 {symbol}。")
         logger.debug(msg = f"{symbol} not found in your watchlist.")
-
 
 @bot.message_handler(commands=['remote'])
 def open_vscode_tunnel(message):
     if not validate_mrzaizai2k_user(message.chat.id):
-        mess = f"This command can just be used by the owner (mrzaizai2k).\nIf you want to use this, clone the git repo and modify the code"
+        mess = "抱歉，该命令仅限主人使用。\n如果你想使用此功能，请自行部署代码。"
         bot.send_message(message.chat.id, mess)
         logger.info(mess)
         return
-    bot.reply_to(message, f"VS Code remote tunnel Opening...")
+
+    bot.reply_to(message, "正在开启 VS Code 远程隧道...")
     Thread(target=run_vscode_tunnel, args=(bot, message)).start()
 
 
