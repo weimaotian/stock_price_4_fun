@@ -54,10 +54,10 @@ def help(message):
 
 @bot.message_handler(commands=['rate', 'risk', 'pbt','mulpattern', 'pattern','snr','buysellanalyze'])
 def ask_for_symbol(message):
-    # Ask for the stock symbol
+    # 下面这两行前面的空格必须完全一致，建议各点 4 个空格
     markup = types.ForceReply(selective = False)
-       bot.reply_to(message, "请输入股票代码（如 AAPL 或 00700）：", reply_markup = markup)
-        if message.text == '/rate':
+    bot.reply_to(message, "请输入股票代码 (如 AAPL 或 00700) : ", reply_markup = markup)
+    if message.text == '/rate':
         bot.register_next_step_handler(message, rate)
     elif message.text == '/risk':
         bot.register_next_step_handler(message, calculate_risk)
