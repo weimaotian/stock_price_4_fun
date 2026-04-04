@@ -45,21 +45,18 @@ news_scraper = NewsScraper()
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    start_commands = read_commands_from_file(data.get('start_commands_path'))
-    help_commands = read_commands_from_file(data.get('help_commands_path'))
-    bot.send_message(message.chat.id, f"{start_commands}{help_commands}" )
+    bot.send_message(message.chat.id, "欢迎使用“方源”股市助手！\n我是你的全能投资伙伴。输入 /help 可以查看功能菜单。")
 
 @bot.message_handler(commands=['help'])
 def help(message):
-    help_commands = read_commands_from_file(data.get('help_commands_path'))
-    bot.send_message(message.chat.id, help_commands)
 
+    bot.send_message(message.chat.id, "📊 方源助手功能清单：\n- /pbt 代码：分析回本时间\n- /snr 代码：找支撑位/阻力位\n- /summarynewsurl 链接：AI总结新闻内容\n直接发送股票代码试试吧！")
 
 @bot.message_handler(commands=['rate', 'risk', 'pbt','mulpattern', 'pattern','snr','buysellanalyze'])
 def ask_for_symbol(message):
     # Ask for the stock symbol
     markup = types.ForceReply(selective = False)
-    bot.reply_to(message, "Please enter the stock symbol:", reply_markup = markup)
+   bot.reply_to(message, "请输入股票代码（如 AAPL 或 00700）：", reply_markup = markup)
     if message.text == '/rate':
         bot.register_next_step_handler(message, rate)
     elif message.text == '/risk':
