@@ -512,27 +512,28 @@ def checklist_button_click(call):
 def ask_for_link(message):
     # Ask for the stock symbol
     markup = types.ForceReply(selective = False)
-    bot.reply_to(message, ""请粘贴需要总结的新闻链接："
+    bot.reply_to(message, "请粘贴需要总结的新闻链接: ")
     bot.register_next_step_handler(message, summary_news_from_links, new_summarizer, news_scraper)
 
 def summary_news_from_links(message, new_summarizer:NewsSummarizer, news_scraper:NewsScraper):
     news_url = message.text
     news = news_scraper.take_text_from_link(news_url=news_url)
-    sum_text = new_summarizer.summary_news(news= news)
-    bot.send_message(message.chat.id, f"这是为你生成的新闻总结：\n {sum_text}"
+    sum_text = new_summarizer.summary_news(news=news)
+    bot.send_message(message.chat.id, f"这是为你生成的新闻总结：\n {sum_text}")
     logger.debug(msg= f"Here's your summary news:\n {sum_text}")
 
 @bot.message_handler(commands=['scrape'])
 def scrape_data(message):
     '''Manually scrape data trading report and update news'''
     if not validate_mrzaizai2k_user(message.chat.id):
-        mess = f"This command can just be used by the owner (mrzaizai2k).\nIf you want to use this, clone the git repo and modify the code"
+        mess = "抱歉，该命令仅限主人方源使用。\n如果你想使用此功能，请自行部署。"
         bot.send_message(message.chat.id, mess)
         logger.info(mess)
         return
-    bot.send_message(message.chat.id, "Please wait. This process can takes several minutes")
-    scrape_trading_data(user_name = TRADE_USER, password = TRADE_PASS,)
-    bot.send_message(message.chat.id, "交易数据抓取完成！"
+
+    bot.send_message(message.chat.id, "请稍候，数据抓取过程可能需要几分钟时间...")
+    scrape_trading_data(user_name = TRADE_USER, password = TRADE_PASS)
+    bot.send_message(message.chat.id, "✅ 交易数据抓取完成！")
     logger.info(msg="Done scraping trading data!")
     summary_news_daily()
     bot.send_message(message.chat.id, "新闻更新完成！"
