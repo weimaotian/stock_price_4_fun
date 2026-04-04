@@ -40,4 +40,6 @@ jobs:
     - name: Run bot
       run: python src/stock_bot.py
       env:
-        TELEBOT_API: ${{ secrets.TELEBOT_API }}
+          TELEBOT_API: ${{ secrets.TELEBOT_API }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
