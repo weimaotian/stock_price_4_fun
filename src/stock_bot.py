@@ -301,44 +301,95 @@ def analyze_winloss(message):
 @bot.message_handler(commands=['watchlist'])
 def handle_watchlist(message):
     markup = types.ReplyKeyboardMarkup(row_width=1, one_time_keyboard=True)
-    watch_button = types.KeyboardButton('Watch')
-    add_button = types.KeyboardButton('Add')
-    remove_button = types.KeyboardButton('Remove')
+    watch_button = types.KeyboardButton('查看清单')
+    add_button = types.KeyboardButton('添加股票')
+    remove_button = types.KeyboardButton('移除股票')
     markup.add(watch_button, add_button, remove_button)
 
-    bot.send_message(message.chat.id, ""请选择操作：")
+    bot.send_message(message.chat.id, "📊 请选择自选清单操作：", reply_markup=markup)
     bot.register_next_step_handler(message, process_button_click)
 
-
 def process_button_click(message):
-    user_action = message.text.lower()
+    user_action = message.text
 
-    if user_action == 'watch':
-        user_db= UserDatabase(user_data_path=user_data_path)
+    if user_action == '查看清单':
+        user_db = UserDatabase(user_data_path=user_data_path)
         watchlist = user_db.get_watch_list(user_id=message.chat.id)
-        bot.send_message(message.chat.id, f"你的自选股清单：{watchlist}"
-    elif user_action == 'add':
-        bot.send_message(message.chat.id, ""请输入要添加的股票名称（例如：AAPL）："
+        bot.send_message(message.chat.id, f"你的自选股清单: {watchlist}")
+    elif user_action == '添加股票':
+        bot.send_message(message.chat.id, "请输入要添加的股票名称 (例如 AAPL) : ")
         bot.register_next_step_handler(message, process_add_stock)
-    elif user_action == 'remove':
-        bot.send_message(message.chat.id, "请输入要移除的股票名称（例如：AAPL）："
+    elif user_action == '移除股票':
+        bot.send_message(message.chat.id, "请输入要移除的股票名称 (例如 AAPL) : ")
         bot.register_next_step_handler(message, process_remove_stock)
     else:
-        bot.send_message(message.chat.id, "无效选项。请选择有效的操作。")
+        bot.send_message(message.chat.id, "无效选项，请重新发送 /watchlist 选择。")
 
-@validate_symbol_decorator(bot)
 def process_add_stock(message):
     symbol = message.text.upper()
-    user_db= UserDatabase(user_data_path=user_data_path)    
+    user_db = UserDatabase(user_data_path=user_data_path)
     watchlist = user_db.get_watch_list(user_id=message.chat.id)
     watchlist.append(symbol)
     user_db.save_watch_list(user_id=message.chat.id, watch_list=watchlist)
-    bot.send_message(message.chat.id, f"已将 {symbol} 添加到自选清单。更新后的清单：{watchlist}"
-    logger.debug(msg = f"{symbol} added to your watchlist. Updated watchlist: {watchlist}")
+    bot.send_message(message.chat.id, f"✅ 已将 {symbol} 添加到自选清单。")
 
-@validate_symbol_decorator(bot)
 def process_remove_stock(message):
     symbol = message.text.upper()
+    user_db = UserDatabase(user_data_path=user_data_path)
+    watchlist = user_db.get_watch_list(user_id=message.chat.id)
+    if symbol in watchlist:
+        watchlist.remove(symbol)
+        user_db.save_watch_list(user_id=message.chat.id, watch_list=watchlist)
+        bot.send_message(message.chat.id, f"🗑️ 已从清单中移除 {symbol}。")
+    else:
+        bot.send_message(message.chat.id, f"❌ 清单中未找到 {symbol}。")
+
+@bot.message_handler(commands=['remote'])
+def open_vscode_tunnel(message):
+    if not validate_mrzaizai2k_user(message.chat.id):
+        bot.send_message(message.chat.id, "抱歉，该命令仅限主人使用。")
+        return
+    bot.reply_to(message, "正在开启 VS Code 远程隧道...")
+    Thread(target=run_vscode_tunnel, args=(bot, message)).start()
+
+def process_remove_stock(message):
+    symbol = message.text.upper()
+    user_db = UserDatabase(user_data_path=user_data_path)
+    watchlist = user_db.get_watch_list(user_id=message.chat.id)
+    if symbol in watchlist:
+        watchlist.remove(symbol)
+        user_db.save_watch_list(user_id=message.chat.id, watch_list=watchlist)
+        bot.send_message(message.chat.id, f"🗑️ 已从清单中移除 {symbol}。")
+    else:
+        bot.send_message(message.chat.id, f"❌ 清单中未找到 {symbol}。")
+
+@bot.message_handler(commands=['remote'])
+def open_vscode_tunnel(message):
+    if not validate_mrzaizai2k_user(message.chat.id):
+        bot.send_message(message.chat.id, "抱歉，该命令仅限主人使用。")
+        return
+    bot.reply_to(message, "正在开启 VS Code 远程隧道...")
+    Thread(target=run_vscode_tunnel, args=(bot, message)).start()
+
+@bot.message_handler(commands=['remote'])
+def open_vscode_tunnel(message):
+    if not validate_mrzaizai2k_user(message.chat.id):
+        mess = "抱歉，该命令仅限主人使用。\n如果你想使用此功能，请自行部署。"
+        bot.send_message(message.chat.id, mess)
+        return
+
+    bot.reply_to(message, "正在开启 VS Code 远程隧道...")
+    Thread(target=run_vscode_tunnel, args=(bot, message)).start()
+def process_remove_stock(message):
+    symbol = message.text.upper()
+    user_db = UserDatabase(user_data_path=user_data_path)
+    watchlist = user_db.get_watch_list(user_id=message.chat.id)
+    if symbol in watchlist:
+        watchlist.remove(symbol)
+        user_db.save_watch_list(user_id=message.chat.id, watch_list=watchlist)
+        bot.send_message(message.chat.id, f"已从清单中移除 {symbol}。更新后的清单: {watchlist}")
+    else:
+        bot.send_message(message.chat.id, f"清单中未找到 {symbol}")
 
     user_db= UserDatabase(user_data_path=user_data_path)
     watchlist = user_db.get_watch_list(user_id=message.chat.id)
