@@ -56,8 +56,8 @@ def help(message):
 def ask_for_symbol(message):
     # Ask for the stock symbol
     markup = types.ForceReply(selective = False)
-   bot.reply_to(message, "请输入股票代码（如 AAPL 或 00700）：", reply_markup = markup)
-    if message.text == '/rate':
+       bot.reply_to(message, "请输入股票代码（如 AAPL 或 00700）：", reply_markup = markup)
+        if message.text == '/rate':
         bot.register_next_step_handler(message, rate)
     elif message.text == '/risk':
         bot.register_next_step_handler(message, calculate_risk)
@@ -74,7 +74,7 @@ def ask_for_symbol(message):
 def ask_pattern_stock(message, command):
     symbol = message.text.upper()
     markup = types.ForceReply(selective = False)
-    bot.reply_to(message, "Please enter the start_date (YYYY-mm-dd):", reply_markup = markup)
+    bot.reply_to(message, "请输入起始日期（格式：YYYY-mm-dd）:", reply_markup = markup)
 
     if command == '/mulpattern':
         bot.register_next_step_handler(message, find_similar_pattern_multi_dimension, symbol)
@@ -84,11 +84,11 @@ def ask_pattern_stock(message, command):
 @bot.message_handler(commands=['masterquest'])
 def ask_for_question(message):
     if not validate_mrzaizai2k_user(message.chat.id):
-        bot.send_message(message.chat.id, f"This command can just be used by the owner (mrzaizai2k).\nIf you want to use this, clone the git repo and modify the code")
+        bot.send_message(message.chat.id, f"抱歉，该命令仅限主人方源使用。\n如果你想使用此功能，请自行部署")
         return
     # Ask for the stock symbol
     markup = types.ForceReply(selective = False)
-    bot.reply_to(message, "Please enter the question:", reply_markup = markup)
+    bot.reply_to(message, "请输入你的问题：:", reply_markup = markup)
     bot.register_next_step_handler(message, masterquest)
 
 def masterquest(message):
@@ -98,20 +98,20 @@ def masterquest(message):
         response = requests.post(masterquest_url, json={'query': query})
         # print(f'Result: {response.json()}')
         logger.debug(msg=f"Result: {response.json()}")
-        bot.reply_to(message, f"The answer from {response.json()['model_type']}: \n{response.json()['result']}")
+        bot.reply_to(message, f"来自 {response.json()['model_type']} 的回答：\n{response.json()['result']}")
         # bot.send_message(message.chat.id, f"The source: {response.json()['source_documents'][0]}")
         
     except Exception as e:
         # print(f'Error: {e}')
         logger.debug(msg=f"Error on LLM and RAG system: {e}")
         print(f'You might need tot run the LLM with RAG system on port 8083')
-        bot.send_message(message.chat.id, f"Error on connecting the LLM and RAG system")
+        bot.send_message(message.chat.id, "连接 LLM 和 RAG 系统时发生错误，请检查后台配置。")
 
 
 @bot.message_handler(commands=['updatevectordb'])
 def updatevectordb(message):
     if not validate_mrzaizai2k_user(message.chat.id):
-        bot.send_message(message.chat.id, f"This command can just be used by the owner (mrzaizai2k).\nIf you want to use this, clone the git repo and modify the code")
+        bot.send_message(message.chat.id, "抱歉，该命令仅限主人方源使用。\n如果你想使用此功能，请自行部署。")
         return
     
     updatevectordb_url = data.get('updatevectordb_url') # Update the URL if your Flask app runs on a different port or host
@@ -119,7 +119,7 @@ def updatevectordb(message):
     if response.status_code == 200:
         # print("Update Vector DB Successful: Update was successful")
         logger.debug(msg = "Update Vector DB Successful: Update was successful")
-        bot.send_message(message.chat.id, "Update was successful")
+       bot.send_message(message.chat.id, "向量数据库更新成功！")
     else:
         # print(f"Update Vector DB Failed: {response.status_code} - {response.json()['message']}")
         logger.debug(msg = f"Update Vector DB Failed: {response.status_code} - {response.json()['message']}")
@@ -129,7 +129,7 @@ def updatevectordb(message):
 def find_similar_pattern(message, symbol):
 
     start_date = message.text # %Y-%m-%d
-    bot.send_message(message.chat.id, "Please wait. This process can takes several minutes")
+    bot.send_message(message.chat.id, "请稍候，由于涉及深度计算，此过程可能需要几分钟时间...")
 
     motif_matching = MotifMatching(symbol=symbol, start_date=start_date)
     image_path = motif_matching.plot_and_save_top_pattern(save_fig=True)
@@ -138,7 +138,7 @@ def find_similar_pattern(message, symbol):
     with open(image_path, 'rb') as photo:
         bot.send_photo(message.chat.id, photo)
 
-    bot.send_message(message.chat.id, f"This is the top 3 pattern (close price) for your symbol {symbol}")
+    bot.send_message(message.chat.id, f"这是股票 {symbol} 的前 3 个价格走势模式（收盘价）：")
 
     os.remove(image_path)
 
@@ -146,7 +146,7 @@ def find_similar_pattern(message, symbol):
 def find_similar_pattern_multi_dimension(message, symbol):
 
     start_date = message.text # %Y-%m-%d
-    bot.send_message(message.chat.id, "Please wait. This process can takes several minutes")
+    bot.send_message(message.chat.id, "请稍候，多维度分析（收盘价 & 成交量）正在进行中，大约需要几分钟时间...")
 
     motif_matching = MotifMatching(symbol=symbol, start_date=start_date)
     image_path = motif_matching.plot_and_save_find_matching_series_multi_dim_with_date(save_fig=True)
@@ -155,7 +155,7 @@ def find_similar_pattern_multi_dimension(message, symbol):
     with open(image_path, 'rb') as photo:
         bot.send_photo(message.chat.id, photo)
 
-    bot.send_message(message.chat.id, f"This is the multi-dimension pattern (close & volume) for your symbol {symbol}")
+    bot.send_message(message.chat.id, f"这是股票 {symbol} 的多维度价格与成交量走势模式：")
 
     os.remove(image_path)
 
@@ -164,7 +164,7 @@ def get_paybacktime(message):
     pbt_params = data.get('pbt_params')
     # Get the symbol from the user's message
     symbol = message.text.upper()
-    bot.send_message(message.chat.id, "Please wait. This process can takes several minutes")
+    bot.send_message(message.chat.id, "请稍候，正在为你精准计算回本时间，请耐心等待几分钟...")
     # Create the PayBackTime object and get the report
     pbt_generator = PayBackTime(symbol=symbol, report_range=pbt_params[0], window_size = pbt_params[1])
     report = pbt_generator.get_report()
@@ -185,7 +185,7 @@ def get_buysell_analyze(message):
     with open(image_path, 'rb') as photo:
         bot.send_photo(message.chat.id, photo)
 
-    bot.send_message(message.chat.id, f'This is your Buy/Sell for stock {symbol}')
+    bot.send_message(message.chat.id, f'这是股票 {symbol} 的买卖交易分析图')
     os.remove(image_path)
 
 @validate_symbol_decorator(bot)
@@ -196,9 +196,9 @@ def get_support_resistance(message):
     # Create the PayBackTime object and get the report
     sr_finding = SupportResistFinding(symbol=symbol)
     result = sr_finding.find_closest_support_resist(current_price=sr_finding.get_current_price())
-    report = f'The current price for {symbol} is {sr_finding.get_current_price()}\n'
-    report += f'- The closest support is {round(result[0], 2)}\n'
-    report += f'- The closest resistance is {round(result[1], 2)}\n'
+    report = f"{symbol} 的当前价格为 {sr_finding.get_current_price()}\n"
+    report += f"- 最近的支撑位是 {round(result[0], 2)}\n"
+    report += f"- 最近的阻力位是 {round(result[1], 2)}\n"
     # Send the report to the user
     bot.send_message(message.chat.id, report)
     logger.debug(msg = f"Report: {report}")
@@ -219,10 +219,10 @@ def calculate_risk(message):
 
     num_stocks = calculate_stocks_to_buy(stock_price, capital = capital_value)
     mess = ""
-    mess += f"You can buy {num_stocks} stocks at the price of {stock_price} each\n"
-    mess += f"Your Captial: {capital_value/1_000_000:.2f} (triệu VND)\n"
-    mess += f'Total price: {stock_price*num_stocks/1_000_000:.2f} (triệu VND)\n'
-    mess += f'The fee is: 0.188% -> {((0.188/100) * stock_price*num_stocks)/1_000} (nghìn VND)\n'
+    mess += f"你可以以每股 {stock_price} 的价格购买 {num_stocks} 股\n"
+    mess += f"你的总资本：{capital_value/1_000_000:.2f} (百万 VND)\n"
+    mess += f"总成交价：{stock_price*num_stocks/1_000_000:.2f} (百万 VND)\n"
+    mess += f"交易手续费 (0.188%)：{((0.188/100) * stock_price*num_stocks)/1_000} (千 VND)\n"
     bot.send_message(message.chat.id, mess)
     logger.debug(msg = f"Risk: {mess}")
 
@@ -230,11 +230,11 @@ def calculate_risk(message):
 def rate(message):
     symbol = message.text.upper()
     if len(symbol) > 3: # Its not for Index
-        bot.send_message(message.chat.id, 'This function can just be used for stocks, not index')
+        bot.send_message(message.chat.id, '"此功能仅适用于个股，不支持指数。"')
         return
     
     rating = general_rating(symbol)
-    report = f"The general rating for {symbol}:\n"
+    report = f"{symbol} 的综合评分如下：\n"
     report += "\n".join([f"{col}: {rating[col].values[0]}" for col in rating.columns])
 
     # Send the report to the user
@@ -249,7 +249,7 @@ def findpbt(message):
     # print('pass_ticker_string',pass_ticker_string)
 
     # Send the report to the user
-    bot.send_message(message.chat.id, f"The Paybacktime stocks are {pass_ticker_string}")
+    bot.send_message(message.chat.id, f"符合回本条件的股票有：{pass_ticker_string}"
     logger.debug(msg = f"Paybacktime stocks: {pass_ticker_string}")
 
 @bot.message_handler(commands=['findmyfav'])
@@ -271,7 +271,7 @@ def findmyfav(message):
     pass_ticker_string = ", ".join(pass_ticker.ticker.unique())
 
     # Send the report to the user
-    bot.send_message(message.chat.id, f"The stocks most suitable for u are: {pass_ticker_string}")
+    bot.send_message(message.chat.id, f"最适合你的股票是：{pass_ticker_string}"
     logger.debug(msg = f"Suitable stocks: {pass_ticker_string}")
 
 
@@ -283,11 +283,11 @@ def findpbt(message):
     report = ""
     for stock, values in result_dict.items():
         start_date, end_date, distance = values
-        report += f"Stock: {stock}\n"
-        report += f"- Date: {start_date} to {end_date}\n"
-        report += f"- Distance: {distance:.3f}\n\n"
+        report += f"股票代码：{stock}\n"
+        report += f"- 日期范围：{start_date} 至 {end_date}\n"
+        report += f"- 相似度距离：{distance:.3f}\n\n"
     # Send the report to the user
-    report += f"Use /mulpattern to see the pattern of each stock with date: {market_motif_search.start_date}"
+    report += f"可以使用 /mulpattern 命令查看指定日期的个股走势，起始日期：{market_motif_search.start_date}"
     bot.send_message(message.chat.id, report)
     logger.debug(msg=f"Use /mulpattern to see the pattern of each stock with date: {market_motif_search.start_date}")
 
@@ -308,7 +308,7 @@ def handle_watchlist(message):
     remove_button = types.KeyboardButton('Remove')
     markup.add(watch_button, add_button, remove_button)
 
-    bot.send_message(message.chat.id, "Choose an action:", reply_markup=markup)
+    bot.send_message(message.chat.id, ""请选择操作：")
     bot.register_next_step_handler(message, process_button_click)
 
 
@@ -318,15 +318,15 @@ def process_button_click(message):
     if user_action == 'watch':
         user_db= UserDatabase(user_data_path=user_data_path)
         watchlist = user_db.get_watch_list(user_id=message.chat.id)
-        bot.send_message(message.chat.id, f"Your watchlist: {watchlist}")
+        bot.send_message(message.chat.id, f"你的自选股清单：{watchlist}"
     elif user_action == 'add':
-        bot.send_message(message.chat.id, "Enter the stock name to add:\n VD: VIX")
+        bot.send_message(message.chat.id, ""请输入要添加的股票名称（例如：AAPL）："
         bot.register_next_step_handler(message, process_add_stock)
     elif user_action == 'remove':
-        bot.send_message(message.chat.id, "Enter the stock name to remove:\n VD: VIX")
+        bot.send_message(message.chat.id, "请输入要移除的股票名称（例如：AAPL）："
         bot.register_next_step_handler(message, process_remove_stock)
     else:
-        bot.send_message(message.chat.id, "Invalid option. Please choose a valid action.")
+        bot.send_message(message.chat.id, "无效选项。请选择有效的操作。")
 
 @validate_symbol_decorator(bot)
 def process_add_stock(message):
@@ -335,7 +335,7 @@ def process_add_stock(message):
     watchlist = user_db.get_watch_list(user_id=message.chat.id)
     watchlist.append(symbol)
     user_db.save_watch_list(user_id=message.chat.id, watch_list=watchlist)
-    bot.send_message(message.chat.id, f"{symbol} added to your watchlist. Updated watchlist: {watchlist}")
+    bot.send_message(message.chat.id, f"已将 {symbol} 添加到自选清单。更新后的清单：{watchlist}"
     logger.debug(msg = f"{symbol} added to your watchlist. Updated watchlist: {watchlist}")
 
 @validate_symbol_decorator(bot)
@@ -348,11 +348,11 @@ def process_remove_stock(message):
     if symbol in watchlist:
         watchlist.remove(symbol)
         user_db.save_watch_list(user_id=message.chat.id, watch_list=watchlist)
-        bot.send_message(message.chat.id, f"{symbol} removed from your watchlist. Updated watchlist: {watchlist}")
+        bot.send_message(message.chat.id, f"已从自选清单中移除 {symbol}。更新后的清单：{watchlist}"
         logger.debug(msg = f"{symbol} removed from your watchlist. Updated watchlist: {watchlist}")
 
     else:
-        bot.send_message(message.chat.id, f"{symbol} not found in your watchlist.")
+        bot.send_message(message.chat.id, f"在自选清单中未找到 {symbol}。"
         logger.debug(msg = f"{symbol} not found in your watchlist.")
 
 
@@ -421,7 +421,7 @@ def send_summary_news():
         all_stocks_list = stock_news_db.get_all_stocks()
         common_stocks = list(set(watchlist) & set(all_stocks_list))
 
-        summary_news = f"Đây là bản tin tổng hợp hàng ngày"
+        summary_news = "这是每日新闻简报总结"
         
         for stock in common_stocks:
             news_text, news_url =  stock_news_db.extract_text_for_stock(stock)
@@ -431,7 +431,7 @@ def send_summary_news():
             summary_news += f"\n-------------"
         bot.send_message(user, summary_news)
 
-        top_news = f"\nTin nổi bật\n"
+        top_news ="今日热点新闻\n"
         top_news += f"\n{stock_news_db.get_top_news()}"
         bot.send_message(user, top_news)
 
@@ -455,7 +455,7 @@ def checklist_button_click(call):
     bot.edit_message_text(
         chat_id=call.message.chat.id,
         message_id=call.message.message_id,
-        text=f'Click to toggle',
+        text="点击切换状态"
         reply_markup=types.InlineKeyboardMarkup(inline_keyboard),
     )
 
@@ -463,14 +463,14 @@ def checklist_button_click(call):
 def ask_for_link(message):
     # Ask for the stock symbol
     markup = types.ForceReply(selective = False)
-    bot.reply_to(message, "Please paste the news url for summarization:", reply_markup = markup)
+    bot.reply_to(message, ""请粘贴需要总结的新闻链接："
     bot.register_next_step_handler(message, summary_news_from_links, new_summarizer, news_scraper)
 
 def summary_news_from_links(message, new_summarizer:NewsSummarizer, news_scraper:NewsScraper):
     news_url = message.text
     news = news_scraper.take_text_from_link(news_url=news_url)
     sum_text = new_summarizer.summary_news(news= news)
-    bot.send_message(message.chat.id, f"Here's your summary news:\n {sum_text}")
+    bot.send_message(message.chat.id, f"这是为你生成的新闻总结：\n {sum_text}"
     logger.debug(msg= f"Here's your summary news:\n {sum_text}")
 
 @bot.message_handler(commands=['scrape'])
@@ -483,10 +483,10 @@ def scrape_data(message):
         return
     bot.send_message(message.chat.id, "Please wait. This process can takes several minutes")
     scrape_trading_data(user_name = TRADE_USER, password = TRADE_PASS,)
-    bot.send_message(message.chat.id, "Done scraping trading data!")
+    bot.send_message(message.chat.id, "交易数据抓取完成！"
     logger.info(msg="Done scraping trading data!")
     summary_news_daily()
-    bot.send_message(message.chat.id, "Done updating news!")
+    bot.send_message(message.chat.id, "新闻更新完成！"
     logger.info(msg="Done updating news!")
 
 @bot.message_handler(commands=['log'])
