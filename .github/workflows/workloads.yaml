@@ -24,6 +24,7 @@ jobs:
         sudo apt install chromium-chromedriver
         sudo apt install -y ffmpeg  # Specify '-y' for automatic yes to prompts
         sudo apt install make
+        python -m pip install --upgrade pip setuptools wheel
         make install
         curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' --output vscode_cli.tar.gz
         tar -xf vscode_cli.tar.gz
