@@ -31,8 +31,8 @@ jobs:
         curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' --output vscode_cli.tar.gz
         tar -xf vscode_cli.tar.gz
 
-    # - name: Run bot tests
-    #   run: make bot
+    - name: Run bot tests
+      run: make bot
 
     - name: Run pay back time test
       run: python src/PayBackTime.py
