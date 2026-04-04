@@ -536,7 +536,7 @@ def scrape_data(message):
     bot.send_message(message.chat.id, "✅ 交易数据抓取完成！")
     logger.info(msg="Done scraping trading data!")
     summary_news_daily()
-    bot.send_message(message.chat.id, "新闻更新完成！"
+    bot.send_message(message.chat.id, "新闻更新完成！")
     logger.info(msg="Done updating news!")
 
 @bot.message_handler(commands=['log'])
