@@ -241,13 +241,13 @@ def rate(message):
 
 @bot.message_handler(commands=['findpbt'])
 def findpbt(message):
-    bot.send_message(message.chat.id, "Please wait. This process can takes several minutes")
+    bot.send_message(message.chat.id, "请稍候，此过程可能需要几分钟时间...")
     pass_ticker = find_PBT_stocks(file_path="memory/paybacktime.csv")
     pass_ticker_string = ", ".join(pass_ticker)
     # print('pass_ticker_string',pass_ticker_string)
 
     # Send the report to the user
-    bot.send_message(message.chat.id, f"符合回本条件的股票有：{pass_ticker_string}"
+    bot.send_message(message.chat.id, f"符合回本条件的股票有: {pass_ticker_string}")
     logger.debug(msg = f"Paybacktime stocks: {pass_ticker_string}")
 
 @bot.message_handler(commands=['findmyfav'])
@@ -259,7 +259,7 @@ def findmyfav(message):
         'pe': (10,20),
         'priceNearRealtime': (10,100),
         # "avgTradingValue20Day": (100, 1000),  # Minimum 20-day average trading value
-    #     'uptrend': 'buy-signal',
+        #   'uptrend': 'buy-signal',
         'macdHistogram': 'macdHistLT0Increase',
         'strongBuyPercentage': (20,100),
         'relativeStrength3Day': (50,100),
@@ -269,7 +269,7 @@ def findmyfav(message):
     pass_ticker_string = ", ".join(pass_ticker.ticker.unique())
 
     # Send the report to the user
-    bot.send_message(message.chat.id, f"最适合你的股票是：{pass_ticker_string}"
+    bot.send_message(message.chat.id, f"最适合你的股票是: {pass_ticker_string}")
     logger.debug(msg = f"Suitable stocks: {pass_ticker_string}")
 
 
