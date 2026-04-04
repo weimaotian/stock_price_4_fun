@@ -47,7 +47,7 @@ class SeperateTaskPrompt:
 
         self.template_path = template_path
         with open(self.template_path, 'r') as file:
-        self.template = file.read() + "\n请务必使用中文进行回复和总结汇报。"
+            self.template = file.read() + "\n请务必使用中文进行回复和总结汇报。"
 
         self.OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
         self.llm = self.load_llm()
