@@ -47,19 +47,20 @@ class SeperateTaskPrompt:
 
         self.template_path = template_path
         with open(self.template_path, 'r') as file:
-            self.template = file.read()
+        self.template = file.read() + "\n请务必使用中文进行回复和总结汇报。"
 
         self.OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
         self.llm = self.load_llm()
         self.output_parser = CommaSeparatedListOutputParser()
 
     def load_llm(self):
-        llm = ChatOpenAI(model="gpt-4o-mini",
-                    openai_api_key=self.OPENAI_API_KEY, 
-                    max_tokens = 512,
-                    temperature=0.7,
-                    )
-        return llm
+           llm = ChatOpenAI(model="gemini-1.5-flash",
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai",
+            openai_api_key=self.OPENAI_API_KEY,
+            max_tokens = 512,
+            temperature=0.7,
+            )
+            return llm
     
     def get_response(self, text) -> list:
         prompt = PromptTemplate.from_template(
