@@ -54,13 +54,13 @@ class SeperateTaskPrompt:
         self.output_parser = CommaSeparatedListOutputParser()
 
     def load_llm(self):
-           llm = ChatOpenAI(model="gemini-1.5-flash",
+        llm = ChatOpenAI(model="gemini-1.5-flash",
             base_url="https://generativelanguage.googleapis.com/v1beta/openai",
             openai_api_key=self.OPENAI_API_KEY,
             max_tokens = 512,
             temperature=0.7,
             )
-            return llm
+        return llm
     
     def get_response(self, text) -> list:
         prompt = PromptTemplate.from_template(
